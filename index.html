@@ -14,34 +14,54 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden; /* Voorkomt scrollen */
+        }
+        .container {
+            width: 90%;
             text-align: center;
         }
-        .count { font-size: 8rem; font-weight: bold; line-height: 1; }
-        .label { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 10px; }
+        .count {
+            /* Responsive lettergrootte: past zich aan schermbreedte aan */
+            font-size: 25vw; 
+            font-weight: 900;
+            line-height: 0.8;
+            margin: 0;
+        }
+        .label {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+        /* Voor grotere schermen de tekst beperken */
+        @media (min-width: 768px) {
+            .count { font-size: 15rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div>
+    <div class="container">
         <div class="count" id="days">0</div>
         <div class="label">Werkdagen te gaan</div>
     </div>
 
     <script>
         function calculate() {
-            const target = new Date(2026, 5, 27); // 27 juni 2026
+            // Deadline: 27 juni 2026
+            const target = new Date(2026, 5, 27); 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            // Jouw vrije dagen (maand is 0-gebaseerd, dus mei=4, juni=5)
+            // Jouw vrije dagen (Mei = maand 4, Juni = maand 5)
             const freeDays = [
-                new Date(2026, 4, 14).getTime(), // 14 mei
-                new Date(2026, 4, 15).getTime(), // 15 mei
-                new Date(2026, 4, 25).getTime(), // 25 mei
-                new Date(2026, 5, 5).getTime(),  // 5 juni
-                new Date(2026, 5, 12).getTime(), // 12 juni
-                new Date(2026, 5, 19).getTime(), // 19 juni
-                new Date(2026, 5, 26).getTime()  // 26 juni
+                new Date(2026, 4, 14).getTime(),
+                new Date(2026, 4, 15).getTime(),
+                new Date(2026, 4, 25).getTime(),
+                new Date(2026, 5, 5).getTime(),
+                new Date(2026, 5, 12).getTime(),
+                new Date(2026, 5, 19).getTime(),
+                new Date(2026, 5, 26).getTime()
             ];
 
             let count = 0;
