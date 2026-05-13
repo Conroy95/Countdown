@@ -1,0 +1,84 @@
+html_content = """
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Werkdagen</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #ff0000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+        .days {
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Werkdagen tot 27 juni 2026</h1>
+    <p class="days" id="countdown">--</p>
+    <p class="label">Dagen te gaan</p>
+</div>
+
+<script>
+    function calculateWorkdays() {
+        const targetDate = new Date('2026-06-27');
+        const today = new Date();
+        
+        // Specifieke uitzonderingsdata (niet meetellen)
+        const excludedDates = [
+            '2026-05-14', '2026-05-15', '2026-05-25',
+            '2026-06-05', '2026-06-12', '2026-06-19', '2026-06-26'
+        ];
+
+        let count = 0;
+        let current = new Date(today);
+        current.setHours(0, 0, 0, 0);
+
+        while (current < targetDate) {
+            const dayOfWeek = current.getDay();
+            const dateString = current.toISOString().split('T')[0];
+
+            // Check of het een doordeweekse dag is (1-5) en niet in de uitzonderingenlijst staat
+            if (dayOfWeek !== 0 && dayOfWeek !== 6 && !excludedDates.includes(dateString)) {
+                count++;
+            }
+            current.setDate(current.getDate() + 1);
+        }
+        return count;
+    }
+
+    document.getElementById('countdown').innerText = calculateWorkdays();
+</script>
+
+</body>
+</html>
+"""
+
+with open("countdown.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
