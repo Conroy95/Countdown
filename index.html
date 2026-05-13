@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown</title>
+    <title>Countdown Werkdagen</title>
     <style>
         body {
             background-color: #ffffff;
@@ -16,54 +16,53 @@
             margin: 0;
             text-align: center;
         }
-        .days {
-            font-size: 6rem;
-            font-weight: bold;
-            margin: 0;
-            line-height: 1;
-        }
-        .label {
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 10px;
-        }
+        .container { padding: 20px; }
+        .days { font-size: 6rem; font-weight: bold; margin: 0; }
+        .label { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
-<div>
+<div class="container">
     <p class="days" id="count">0</p>
-    <p class="label">Werkdagen tot 27 juni 2026</p>
+    <p class="label">Werkdagen te gaan</p>
 </div>
 
 <script>
-    function calculate() {
+    function calculateWorkdays() {
         const target = new Date('2026-06-27');
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
+        // De specifieke dagen die NOOIT meegeteld mogen worden
         const exclude = [
             '2026-05-14', '2026-05-15', '2026-05-25',
             '2026-06-05', '2026-06-12', '2026-06-19', '2026-06-26'
         ];
 
-        let total = 0;
-        let d = new Date(today);
+        let count = 0;
+        let cur = new Date(today);
+        
+        // We beginnen te tellen vanaf de dag NA vandaag
+        cur.setDate(cur.getDate() + 1);
 
-        while (d < target) {
-            const dayOfWeek = d.getDay();
-            const dateStr = d.toISOString().split('T')[0];
+        while (cur < target) {
+            const dayOfWeek = cur.getDay(); // 0 = zondag, 6 = zaterdag
+            const dateStr = cur.toISOString().split('T')[0];
             
-            // Check: geen zondag (0), geen zaterdag (6) en niet in de lijst met vrije dagen
-            if (dayOfWeek !== 0 && dayOfWeek !== 6 && !exclude.includes(dateStr)) {
-                total++;
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            const isExcluded = exclude.includes(dateStr);
+
+            // Tel de dag alleen als het GEEN weekend is EN de datum NIET in de lijst staat
+            if (!isWeekend && !isExcluded) {
+                count++;
             }
-            d.setDate(d.getDate() + 1);
+            cur.setDate(cur.getDate() + 1);
         }
-        return total;
+        return count;
     }
-    document.getElementById('count').innerText = calculate();
+
+    document.getElementById('count').innerText = calculateWorkdays();
 </script>
 
 </body>
