@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown Werkdagen</title>
+    <title>Countdown</title>
     <style>
         body {
-            background-color: #ffffff;
-            color: #ff0000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: white;
+            color: red;
+            font-family: -apple-system, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,54 +16,48 @@
             margin: 0;
             text-align: center;
         }
-        .container { padding: 20px; }
-        .days { font-size: 6rem; font-weight: bold; margin: 0; }
-        .label { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
+        .count { font-size: 8rem; font-weight: bold; line-height: 1; }
+        .label { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <p class="days" id="count">0</p>
-    <p class="label">Werkdagen te gaan</p>
-</div>
+    <div>
+        <div class="count" id="days">0</div>
+        <div class="label">Werkdagen te gaan</div>
+    </div>
 
-<script>
-    function calculateWorkdays() {
-        const target = new Date('2026-06-27');
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+    <script>
+        function calculate() {
+            const target = new Date('2026-06-27');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-        // De specifieke dagen die NOOIT meegeteld mogen worden
-        const exclude = [
-            '2026-05-14', '2026-05-15', '2026-05-25',
-            '2026-06-05', '2026-06-12', '2026-06-19', '2026-06-26'
-        ];
+            const freeDays = [
+                '2026-05-14', '2026-05-15', '2026-05-25',
+                '2026-06-05', '2026-06-12', '2026-06-19', '2026-06-26'
+            ];
 
-        let count = 0;
-        let cur = new Date(today);
-        
-        // We beginnen te tellen vanaf de dag NA vandaag
-        cur.setDate(cur.getDate() + 1);
+            let count = 0;
+            let current = new Date(today); // Start bij vandaag
 
-        while (cur < target) {
-            const dayOfWeek = cur.getDay(); // 0 = zondag, 6 = zaterdag
-            const dateStr = cur.toISOString().split('T')[0];
-            
-            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-            const isExcluded = exclude.includes(dateStr);
+            while (current < target) {
+                const dayOfWeek = current.getDay(); 
+                const dateStr = current.toISOString().split('T')[0];
 
-            // Tel de dag alleen als het GEEN weekend is EN de datum NIET in de lijst staat
-            if (!isWeekend && !isExcluded) {
-                count++;
+                const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                const isFreeDay = freeDays.includes(dateStr);
+
+                if (!isWeekend && !isFreeDay) {
+                    count++;
+                }
+                current.setDate(current.getDate() + 1);
             }
-            cur.setDate(cur.getDate() + 1);
+            return count;
         }
-        return count;
-    }
 
-    document.getElementById('count').innerText = calculateWorkdays();
-</script>
+        document.getElementById('days').innerText = calculate();
+    </script>
 
 </body>
 </html>
