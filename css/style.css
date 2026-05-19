@@ -4,32 +4,32 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
     padding: 0;
-    width: 400px; /* Vaste breedte voor de widget */
+    width: 400px; /* Vaste breedte van de widget */
     box-sizing: border-box;
 }
 
 .countdown-list {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Kleine ruimte tussen de widgets */
+    gap: 4px; /* Minimale ruimte tussen de balkjes */
 }
 
 .countdown-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 4px solid red; 
-    padding: 0 30px;
+    border: 2px solid red; /* Iets dunnere rand voor het compacte design */
+    padding: 0 15px;
     box-sizing: border-box; 
     
-    /* Elk object is nu 400x150 */
+    /* Veel compacter formaat */
     width: 400px;
-    height: 150px;
-    flex-shrink: 0; /* Voorkomt dat items kleiner worden */
+    height: 45px; 
+    flex-shrink: 0;
 }
 
 .title {
-    font-size: 2.2rem;
+    font-size: 1.3rem;
     font-weight: bold;
     white-space: nowrap;
     overflow: hidden;
@@ -37,19 +37,19 @@ body {
 }
 
 .count {
-    font-size: 4rem;
+    font-size: 1.6rem;
     font-weight: 900;
     line-height: 1;
 }
 
-/* Mobiele schaling: als de TopDesk widget op een telefoon wordt bekeken */
+/* Mobiele schaling: voor als de widget smaller getoond wordt op telefoons */
 @media (max-width: 400px) {
     body, .countdown-item {
         width: 100vw;
     }
     .countdown-item {
-        height: 37.5vw; /* Behoudt de 400:150 verhouding op mobiel */
+        height: 11.25vw; /* Behoudt de verhouding op mobiel */
     }
-    .title { font-size: 8vw; }
-    .count { font-size: 14vw; }
+    .title { font-size: 5vw; }
+    .count { font-size: 6vw; }
 }
