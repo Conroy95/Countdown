@@ -16,7 +16,7 @@ body {
 
 .countdown-item {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start; /* Lijnt de tekst netjes achter elkaar uit vanaf links */
     align-items: center;
     border: 2px solid red; 
     padding: 0 12px;
@@ -24,20 +24,13 @@ body {
     width: 360px;
     height: 32px; 
     flex-shrink: 0;
-}
-
-.title {
-    font-size: 1.05rem;
+    
+    /* Vormgeving voor de gehele zin */
+    font-size: 1.15rem;
     font-weight: bold;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.count {
-    font-size: 1.35rem;
-    font-weight: 900;
-    line-height: 1;
 }
 
 /* Mobiele schaling */
@@ -47,7 +40,6 @@ body {
     }
     .countdown-item {
         height: 8.8vw; 
+        font-size: 4.5vw;
     }
-    .title { font-size: 4.2vw; }
-    .count { font-size: 5.5vw; }
 }
