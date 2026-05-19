@@ -3,42 +3,45 @@ function getWorkingDaysLeft(targetDate) {
     today.setHours(0, 0, 0, 0);
 
     let count = 0;
-    let current = new Date(today); // We starten direct vanaf vandaag (19 mei)
+    let current = new Date(today); // Start direct op vandaag (19 mei)
 
     if (current >= targetDate) return 0;
 
     while (current < targetDate) {
         const dayOfWeek = current.getDay(); 
-        const currentMonth = current.getMonth(); // 4 = Mei, 5 = Juni, 6 = Juli, 11 = Dec, 0 = Jan
+        const currentMonth = current.getMonth(); // 4=Mei, 5=Juni, 6=Juli, 11=Dec, 0=Jan
         const currentDate = current.getDate();
-        const currentTime = current.getTime();
 
-        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6); // Zondag = 0, Zaterdag = 6
+        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
         
-        // Specifieke vrije dag: Maandag 25 mei 2026 (Maand 4 = Mei)
+        // 1. Vrije dag: Maandag 25 mei 2026
         const isPinksteren = (currentMonth === 4 && currentDate === 25);
 
-        // Vrijdag logica:
-        // Vrijdag (5) is een vrije dag in Juni (maand 5) EN in Juli (maand 6) tot en met 20 juli.
+        // 2. Vrijdagen vrij vanaf juni tot en met 20 juli
         let isVrijdagVrij = false;
         if (dayOfWeek === 5) {
             if (currentMonth === 5) { 
-                isVrijdagVrij = true;
+                isVrijdagVrij = true; // Juni
             } else if (currentMonth === 6 && currentDate <= 20) {
-                isVrijdagVrij = true;
+                isVrijdagVrij = true; // Juli t/m de 20e
             }
         }
 
-        // Kerstvakantie logica:
-        // Vrij van 25 december (maand 11) t/m 3 januari (maand 0)
+        // 3. Jouw vakantie: 27 juni t/m 18 juli
+        let isMijnVakantie = false;
+        // Controleer of de datum binnen 27-06 en 18-07 valt
+        if ((currentMonth === 5 && currentDate >= 27) || (currentMonth === 6 && currentDate <= 18)) {
+            isMijnVakantie = true;
+        }
+
+        // 4. Kerstvakantie: 25 december t/m 3 januari
         let isKerstVakantie = false;
         if ((currentMonth === 11 && currentDate >= 25) || (currentMonth === 0 && currentDate <= 3)) {
             isKerstVakantie = true;
         }
 
-        // De dag telt ALLEEN als werkdag als het:
-        // GEEN weekend is, GEEN 25 mei is, GEEN vrije vrijdag is én GEEN kerstvakantie is
-        if (!isWeekend && !isPinksteren && !isVrijdagVrij && !isKerstVakantie) {
+        // De dag telt alleen als er GEEN enkele uitzondering actief is
+        if (!isWeekend && !isPinksteren && !isVrijdagVrij && !isMijnVakantie && !isKerstVakantie) {
             count++;
         }
         
