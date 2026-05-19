@@ -32,7 +32,7 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Mobiele schaling voor TopDesk app/mobiel */
+/* Mobiele schaling */
 @media (max-width: 360px) {
     body, .countdown-item {
         width: 100vw;
