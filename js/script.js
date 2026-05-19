@@ -21,19 +21,13 @@ function getWorkingDaysLeft(targetDate, freeDaysArray = []) {
 }
 
 window.onload = function() {
-    // 1. Vakantie in Mei
-    const targetMei = new Date(2026, 4, 30); 
+    // Stel hier je deadline en eventuele vrije dagen in
+    const targetMei = new Date(2026, 4, 30); // 30 mei 2026
     const freeDaysMei = [
         new Date(2026, 4, 14).getTime(),
         new Date(2026, 4, 15).getTime()
     ];
+    
+    // Toon het resultaat
     document.getElementById('vrij-mei').innerText = getWorkingDaysLeft(targetMei, freeDaysMei);
-
-    // 2. Kerstvakantie
-    const targetKerst = new Date(2026, 11, 25); 
-    document.getElementById('kerst').innerText = getWorkingDaysLeft(targetKerst);
-
-    // 3. Zomervakantie
-    const targetZomer = new Date(2026, 5, 27); 
-    document.getElementById('zomer').innerText = getWorkingDaysLeft(targetZomer);
 };
