@@ -14,6 +14,7 @@ function getWorkingDaysLeft(targetDate, freeDaysArray = []) {
         const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
         const isFreeDay = freeDaysArray.includes(currentTime);
 
+        // Alleen tellen als het een doordeweekse dag is én geen vrije dag
         if (!isWeekend && !isFreeDay) {
             count++;
         }
@@ -23,10 +24,20 @@ function getWorkingDaysLeft(targetDate, freeDaysArray = []) {
 }
 
 window.onload = function() {
-    // 1. Vakantie in Mei
-    const targetMei = new Date(2026, 4, 30); 
-    const freeMei = [new Date(2026, 4, 14).getTime(), new Date(2026, 4, 15).getTime()];
-    document.getElementById('vrij-mei').innerText = getWorkingDaysLeft(targetMei, freeMei);
+    // 1. Amerika (als voorbeeld de deadline gezet op 27 juni 2026)
+    const targetAmerika = new Date(2026, 5, 27); 
+    
+    // Jouw specifieke vrije dagen die worden afgetrokken:
+    const freeDaysAmerika = [
+        new Date(2026, 3, 14).getTime(), // 14-04-2026
+        new Date(2026, 3, 15).getTime(), // 15-04-2026
+        new Date(2026, 3, 25).getTime(), // 25-04-2026
+        new Date(2026, 5, 5).getTime(),  // 05-06-2026
+        new Date(2026, 5, 12).getTime(), // 12-06-2026
+        new Date(2026, 5, 19).getTime(), // 19-06-2026
+        new Date(2026, 5, 26).getTime()  // 26-06-2026
+    ];
+    document.getElementById('amerika').innerText = getWorkingDaysLeft(targetAmerika, freeDaysAmerika);
 
     // 2. Kerst
     const targetKerst = new Date(2026, 11, 25); 
