@@ -3,9 +3,8 @@ function getWorkingDaysLeft(targetDate, freeDaysArray = []) {
     today.setHours(0, 0, 0, 0);
 
     let count = 0;
+    // We starten met tellen vanaf morgen
     let current = new Date(today);
-    
-    // Begin de volgende dag te tellen om correct af te ronden
     current.setDate(current.getDate() + 1);
 
     if (current >= targetDate) return 0;
@@ -17,6 +16,7 @@ function getWorkingDaysLeft(targetDate, freeDaysArray = []) {
         const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
         const isFreeDay = freeDaysArray.includes(currentTime);
 
+        // Tel de dag alleen mee als het een doordeweekse dag is én je geen vrije dag hebt
         if (!isWeekend && !isFreeDay) {
             count++;
         }
@@ -25,21 +25,9 @@ function getWorkingDaysLeft(targetDate, freeDaysArray = []) {
     return count;
 }
 
-// Hulpfunctie om een aaneengesloten datumbereik (t/m) toe te voegen
-function addRangeToFreeDays(startDate, endDate, freeDaysArray) {
-    let current = new Date(startDate);
-    while (current <= endDate) {
-        freeDaysArray.push(current.getTime());
-        current.setDate(current.getDate() + 1);
-    }
-}
-
 window.onload = function() {
-    // Jouw gezamenlijke basislijst met losse vrije dagen (Maand is 0-geindexeerd, dus april=3, juni=5)
+    // Jouw specifieke losse vrije dagen in juni 2026 (Maand 5 = Juni)
     const mijnVrijeDagen = [
-        new Date(2026, 3, 14).getTime(), // 14-04-2026
-        new Date(2026, 3, 15).getTime(), // 15-04-2026
-        new Date(2026, 3, 25).getTime(), // 25-04-2026
         new Date(2026, 5, 5).getTime(),  // 05-06-2026
         new Date(2026, 5, 12).getTime(), // 12-06-2026
         new Date(2026, 5, 19).getTime(), // 19-06-2026
@@ -47,30 +35,23 @@ window.onload = function() {
         new Date(2026, 5, 26).getTime()  // 26-06-2026
     ];
 
-    // Voeg de vakantieperiode toe: 27 juni 2026 t/m 18 juli 2026 (juli = maand 6)
-    const startPeriode = new Date(2026, 5, 27);
-    const eindPeriode = new Date(2026, 6, 18);
-    addRangeToFreeDays(startPeriode, eindPeriode, mijnVrijeDagen);
-
-
-    // 1. Amerika (Voorbeeld deadline op 27 juni gehouden, past zich aan o.b.v. jouw vrije dagen)
+    // 1. Amerika (27 juni 2026)
     const targetAmerika = new Date(2026, 5, 27); 
     const dagenAmerika = getWorkingDaysLeft(targetAmerika, mijnVrijeDagen);
-    document.getElementById('amerika').innerText = `Amerika in ${dagenAmerika} dagen`;
+    document.getElementById('amerika').innerText = `Amerika in ${dagenAmerika} werkdagen`;
 
-    // 2. Kerst (25 december 2026)
-    const targetKerst = new Date(2026, 11, 25); 
-    const dagenKerst = getWorkingDaysLeft(targetKerst, mijnVrijeDagen);
-    document.getElementById('kerst').innerText = `Kerstvakantie in ${dagenKerst} dagen`;
-
-    // 3. Zomervakantie (Nu aangepast naar 25 juli 2026!)
+    // 2. Zomervakantie (25 juli 2026)
     const targetZomer = new Date(2026, 6, 25); 
     const dagenZomer = getWorkingDaysLeft(targetZomer, mijnVrijeDagen);
-    document.getElementById('zomer').innerText = `Zomervakantie in ${dagenZomer} dagen`;
+    document.getElementById('zomer').innerText = `Zomervakantie in ${dagenZomer} werkdagen`;
 
-    // 4. Weekend!
-    const nextFriday = new Date();
-    nextFriday.setDate(nextFriday.getDate() + (5 - nextFriday.getDay() + 7) % 7);
-    const dagenWeekend = getWorkingDaysLeft(nextFriday, mijnVrijeDagen);
-    document.getElementById('weekend').innerText = `Weekend in ${dagenWeekend} dagen`;
+    // 3. Kerstvakantie (25 december 2026)
+    const targetKerst = new Date(2026, 11, 25); 
+    const dagenKerst = getWorkingDaysLeft(targetKerst, mijnVrijeDagen);
+    document.getElementById('kerst').innerText = `Kerstvakantie in ${dagenKerst} werkdagen`;
+
+    // 4. Oud & Nieuw (31 december 2026)
+    const targetOudNieuw = new Date(2026, 11, 31); 
+    const dagenOudNieuw = getWorkingDaysLeft(targetOudNieuw, mijnVrijeDagen);
+    document.getElementById('oudnieuw').innerText = `Oud & Nieuw in ${dagenOudNieuw} werkdagen`;
 };
