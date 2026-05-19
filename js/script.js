@@ -5,6 +5,8 @@ function getWorkingDaysLeft(targetDate, freeDaysArray = []) {
     let count = 0;
     let current = new Date(today);
 
+    if (current >= targetDate) return 0;
+
     while (current < targetDate) {
         const dayOfWeek = current.getDay(); 
         const currentTime = current.getTime();
@@ -21,13 +23,22 @@ function getWorkingDaysLeft(targetDate, freeDaysArray = []) {
 }
 
 window.onload = function() {
-    // Stel hier je deadline en eventuele vrije dagen in
-    const targetMei = new Date(2026, 4, 30); // 30 mei 2026
-    const freeDaysMei = [
-        new Date(2026, 4, 14).getTime(),
-        new Date(2026, 4, 15).getTime()
-    ];
-    
-    // Toon het resultaat
-    document.getElementById('vrij-mei').innerText = getWorkingDaysLeft(targetMei, freeDaysMei);
+    // 1. Vakantie in Mei
+    const targetMei = new Date(2026, 4, 30); 
+    const freeMei = [new Date(2026, 4, 14).getTime(), new Date(2026, 4, 15).getTime()];
+    document.getElementById('vrij-mei').innerText = getWorkingDaysLeft(targetMei, freeMei);
+
+    // 2. Kerst (25 dec 2026)
+    const targetKerst = new Date(2026, 11, 25); 
+    document.getElementById('kerst').innerText = getWorkingDaysLeft(targetKerst);
+
+    // 3. Zomervakantie (27 juni 2026)
+    const targetZomer = new Date(2026, 5, 27); 
+    document.getElementById('zomer').innerText = getWorkingDaysLeft(targetZomer);
+
+    // 4. Eerstvolgende vrijdag (als voorbeeld voor 'Weekend!')
+    // Dit rekent simpelweg uit hoeveel werkdagen er in de huidige week nog zijn
+    const nextFriday = new Date();
+    nextFriday.setDate(nextFriday.getDate() + (5 - nextFriday.getDay() + 7) % 7);
+    document.getElementById('weekend').innerText = getWorkingDaysLeft(nextFriday);
 };
