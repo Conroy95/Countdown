@@ -1,29 +1,17 @@
-function calculate() {
-    // Deadline: 27 juni 2026
-    const target = new Date(2026, 5, 27); 
+// Centrale functie om werkdagen te berekenen tot een specifieke datum
+function getWorkingDaysLeft(targetDate, freeDaysArray = []) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
-    // Jouw vrije dagen (Mei = maand 4, Juni = maand 5)
-    const freeDays = [
-        new Date(2026, 4, 14).getTime(),
-        new Date(2026, 4, 15).getTime(),
-        new Date(2026, 4, 25).getTime(),
-        new Date(2026, 5, 5).getTime(),
-        new Date(2026, 5, 12).getTime(),
-        new Date(2026, 5, 19).getTime(),
-        new Date(2026, 5, 26).getTime()
-    ];
 
     let count = 0;
     let current = new Date(today);
 
-    while (current < target) {
+    while (current < targetDate) {
         const dayOfWeek = current.getDay(); 
         const currentTime = current.getTime();
 
         const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-        const isFreeDay = freeDays.includes(currentTime);
+        const isFreeDay = freeDaysArray.includes(currentTime);
 
         if (!isWeekend && !isFreeDay) {
             count++;
@@ -33,5 +21,22 @@ function calculate() {
     return count;
 }
 
-// Zet de berekende dagen in de HTML
-document.getElementById('days').innerText = calculate();
+// Hier voer je de berekeningen uit zodra de pagina laadt
+window.onload = function() {
+    
+    // --- COUNTDOWN 1: Vakantie in Mei ---
+    const targetMei = new Date(2026, 4, 30); // 30 mei 2026
+    const freeDaysMei = [
+        new Date(2026, 4, 14).getTime(),
+        new Date(2026, 4, 15).getTime()
+    ];
+    document.getElementById('vrij-mei').innerText = getWorkingDaysLeft(targetMei, freeDaysMei);
+
+    // --- COUNTDOWN 2: Kerstvakantie ---
+    const targetKerst = new Date(2026, 11, 25); // 25 december 2026 (Maand 11 = December)
+    document.getElementById('kerst').innerText = getWorkingDaysLeft(targetKerst);
+
+    // --- COUNTDOWN 3: Zomervakantie ---
+    const targetZomer = new Date(2026, 5, 27); // 27 juni 2026 (Maand 5 = Juni)
+    document.getElementById('zomer').innerText = getWorkingDaysLeft(targetZomer);
+};
