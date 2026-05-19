@@ -2,54 +2,54 @@ body {
     background-color: white;
     color: red;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     margin: 0;
-    padding: 15px;
-    box-sizing: border-box;
-}
-
-.container {
-    width: 100%;
-    max-width: 400px; /* De exacte breedte die je vroeg */
-}
-
-.countdown-list {
-    list-style: none;
     padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Ruimte tussen de blokken */
+    
+    /* Dwing de body exact in het Topdesk-formaat */
+    width: 400px;
+    height: 150px;
+    overflow: hidden; /* Weg met die scrollbalken! */
+    box-sizing: border-box;
 }
 
 .countdown-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 4px solid red; /* Stevige rode rand zoals de schets */
-    padding: 0 25px;       /* Padding aan de zijkanten */
-    box-sizing: border-box;
-    width: 100%;
     
-    /* Dit dwingt de 400x150 verhouding af, ook als het scherm kleiner wordt */
-    aspect-ratio: 400 / 150; 
+    /* De rand zit nu strak tegen de rand van de widget aan */
+    border: 4px solid red; 
+    padding: 0 30px;
+    
+    /* Vul exact de volledige widget op minus de border */
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box; 
 }
 
-/* Flexibele lettertypes die perfect meeschalen met de schermbreedte */
 .title {
-    font-size: clamp(1.2rem, 6.5vw, 2.2rem);
+    font-size: 2.2rem;
     font-weight: bold;
-    text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Voorkomt dat te lange titels de boel breken */
+    text-overflow: ellipsis;
 }
 
 .count {
-    font-size: clamp(2rem, 11vw, 3.8rem);
+    font-size: 4rem;
     font-weight: 900;
     line-height: 1;
+}
+
+/* Mocht de Topdesk widget op mobiel toch smaller worden getoond, 
+   dan schalen de letters automatisch netjes mee terug */
+@media (max-width: 400px) {
+    body {
+        width: 100vw;
+        height: auto;
+        aspect-ratio: 400 / 150;
+    }
+    .title { font-size: 8vw; }
+    .count { font-size: 14vw; }
+    .countdown-item { padding: 0 5vw; }
 }
