@@ -1,0 +1,38 @@
+body {
+    background-color: white;
+    color: red;
+    font-family: -apple-system, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden; /* Voorkomt scrollen */
+}
+
+.container {
+    width: 90%;
+    text-align: center;
+}
+
+.count {
+    /* Responsive lettergrootte: past zich aan schermbreedte aan */
+    font-size: 25vw; 
+    font-weight: 900;
+    line-height: 0.8;
+    margin: 0;
+}
+
+.label {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 20px;
+}
+
+/* Voor grotere schermen de tekst beperken */
+@media (min-width: 768px) {
+    .count { 
+        font-size: 15rem; 
+    }
+}
