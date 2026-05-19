@@ -28,16 +28,15 @@ window.onload = function() {
     const freeMei = [new Date(2026, 4, 14).getTime(), new Date(2026, 4, 15).getTime()];
     document.getElementById('vrij-mei').innerText = getWorkingDaysLeft(targetMei, freeMei);
 
-    // 2. Kerst (25 dec 2026)
+    // 2. Kerst
     const targetKerst = new Date(2026, 11, 25); 
     document.getElementById('kerst').innerText = getWorkingDaysLeft(targetKerst);
 
-    // 3. Zomervakantie (27 juni 2026)
+    // 3. Zomervakantie
     const targetZomer = new Date(2026, 5, 27); 
     document.getElementById('zomer').innerText = getWorkingDaysLeft(targetZomer);
 
-    // 4. Eerstvolgende vrijdag (als voorbeeld voor 'Weekend!')
-    // Dit rekent simpelweg uit hoeveel werkdagen er in de huidige week nog zijn
+    // 4. Weekend!
     const nextFriday = new Date();
     nextFriday.setDate(nextFriday.getDate() + (5 - nextFriday.getDay() + 7) % 7);
     document.getElementById('weekend').innerText = getWorkingDaysLeft(nextFriday);
