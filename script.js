@@ -1,48 +1,150 @@
-function getThanksgiving(year) {
-  // 4e donderdag van november
-  const novFirst = new Date(year, 10, 1);
-  const dayOfWeek = novFirst.getDay();
-  const offset = (4 - dayOfWeek + 7) % 7;
-  return new Date(year, 10, 1 + offset + 21, 0, 0, 0);
+const TIMEZONE = 'Europe/Amsterdam';
+
+// Converteer een kalenderdatum (jaar, maand 1-12, dag) naar exact 00:00:00 Nederlandse tijd
+function getDutchMidnight(year, month, day) {
+  const approxUtc = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: TIMEZONE,
+    timeZoneName: 'shortOffset'
+  }).formatToParts(approxUtc);
+
+  const tzPart = parts.find((p) => p.type === 'timeZoneName').value;
+  const match = tzPart.match(/GMT([+-]\d+)(?::(\d+))?/);
+  const offsetHours = match ? parseInt(match[1], 10) : 1;
+  const offsetMinutes = match && match[2] ? parseInt(match[2], 10) : 0;
+  const totalOffsetMs = (offsetHours * 60 + Math.sign(offsetHours) * offsetMinutes) * 60 * 1000;
+
+  return new Date(Date.UTC(year, month - 1, day, 0, 0, 0) - totalOffsetMs);
 }
 
-function getNextDate(getDateForYear) {
+function addDays(dateObj, days) {
+  const d = new Date(Date.UTC(dateObj.year, dateObj.month - 1, dateObj.day + days));
+  return {
+    year: d.getUTCFullYear(),
+    month: d.getUTCMonth() + 1,
+    day: d.getUTCDate()
+  };
+}
+
+// Gregoriaanse paasberekening (voor elk jaar)
+function getEaster(year) {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return { year, month, day };
+}
+
+// 4e donderdag van november
+function getThanksgiving(year) {
+  const novFirst = new Date(Date.UTC(year, 10, 1));
+  const dayOfWeek = novFirst.getUTCDay();
+  const offset = (4 - dayOfWeek + 7) % 7;
+  return { year, month: 11, day: 1 + offset + 21 };
+}
+
+function getNextOccurrence(getDatePartsForYear) {
   const now = new Date();
-  const currentYear = now.getFullYear();
-  let target = getDateForYear(currentYear);
+  const currentYear = Number(
+    new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, year: 'numeric' }).format(now)
+  );
+
+  let parts = getDatePartsForYear(currentYear);
+  let target = getDutchMidnight(parts.year, parts.month, parts.day);
 
   if (now >= target) {
-    target = getDateForYear(currentYear + 1);
+    parts = getDatePartsForYear(currentYear + 1);
+    target = getDutchMidnight(parts.year, parts.month, parts.day);
   }
   return target;
 }
 
-const events = [
+const rawEvents = [
+  {
+    id: 'nieuwjaarsdag',
+    name: 'Nieuwjaarsdag',
+    getDate: () => getNextOccurrence((y) => ({ year: y, month: 1, day: 1 }))
+  },
+  {
+    id: 'goede-vrijdag',
+    name: 'Goede Vrijdag',
+    getDate: () => getNextOccurrence((y) => addDays(getEaster(y), -2))
+  },
+  {
+    id: 'eerste-paasdag',
+    name: 'Eerste Paasdag',
+    getDate: () => getNextOccurrence((y) => getEaster(y))
+  },
+  {
+    id: 'tweede-paasdag',
+    name: 'Tweede Paasdag',
+    getDate: () => getNextOccurrence((y) => addDays(getEaster(y), 1))
+  },
+  {
+    id: 'koningsdag',
+    name: 'Koningsdag',
+    getDate: () =>
+      getNextOccurrence((y) => {
+        // Als 27 april op een zondag valt, wordt Koningsdag op 26 april gevierd
+        const isSunday = new Date(Date.UTC(y, 3, 27)).getUTCDay() === 0;
+        return { year: y, month: 4, day: isSunday ? 26 : 27 };
+      })
+  },
+  {
+    id: 'hemelvaartsdag',
+    name: 'Hemelvaartsdag',
+    getDate: () => getNextOccurrence((y) => addDays(getEaster(y), 39))
+  },
+  {
+    id: 'eerste-pinksterdag',
+    name: 'Eerste Pinksterdag',
+    getDate: () => getNextOccurrence((y) => addDays(getEaster(y), 49))
+  },
+  {
+    id: 'tweede-pinksterdag',
+    name: 'Tweede Pinksterdag',
+    getDate: () => getNextOccurrence((y) => addDays(getEaster(y), 50))
+  },
   {
     id: 'thanksgiving',
     name: 'Thanksgiving',
-    getDate: () => getNextDate(getThanksgiving)
+    getDate: () => getNextOccurrence((y) => getThanksgiving(y))
   },
   {
-    id: 'christmas',
-    name: 'Christmas',
-    getDate: () => getNextDate((year) => new Date(year, 11, 25, 0, 0, 0))
+    id: 'eerste-kerstdag',
+    name: 'Christmas / Eerste Kerstdag',
+    getDate: () => getNextOccurrence((y) => ({ year: y, month: 12, day: 25 }))
   },
   {
-    id: 'newyear',
-    name: 'New Year',
-    getDate: () => getNextDate((year) => new Date(year, 0, 1, 0, 0, 0))
+    id: 'tweede-kerstdag',
+    name: 'Tweede Kerstdag',
+    getDate: () => getNextOccurrence((y) => ({ year: y, month: 12, day: 26 }))
   }
 ];
 
 const container = document.getElementById('countdown-list');
 
-// Bouw de HTML-structuur op
-events.forEach((event) => {
-  const targetDate = event.getDate();
-  const formattedDate = targetDate.toLocaleDateString('en-US', {
-    month: 'short',
+// Sorteer zodat de eerstvolgende feestdag altijd bovenaan staat
+const sortedEvents = rawEvents
+  .map((ev) => ({ ...ev, target: ev.getDate() }))
+  .sort((a, b) => a.target - b.target);
+
+sortedEvents.forEach((event) => {
+  const formattedDate = event.target.toLocaleDateString('nl-NL', {
+    timeZone: TIMEZONE,
+    weekday: 'long',
     day: 'numeric',
+    month: 'long',
     year: 'numeric'
   });
 
@@ -51,24 +153,24 @@ events.forEach((event) => {
   section.innerHTML = `
     <div class="event-header">
       <h2 class="event-title">${event.name}</h2>
-      <span class="event-date" id="${event.id}-date">${formattedDate}</span>
+      <span class="event-date">${formattedDate}</span>
     </div>
     <div class="timer">
       <div class="unit">
         <span class="number" id="${event.id}-days">00</span>
-        <span class="label">Days</span>
+        <span class="label">Dagen</span>
       </div>
       <div class="unit">
         <span class="number" id="${event.id}-hours">00</span>
-        <span class="label">Hours</span>
+        <span class="label">Uren</span>
       </div>
       <div class="unit">
         <span class="number" id="${event.id}-minutes">00</span>
-        <span class="label">Minutes</span>
+        <span class="label">Minuten</span>
       </div>
       <div class="unit">
         <span class="number" id="${event.id}-seconds">00</span>
-        <span class="label">Seconds</span>
+        <span class="label">Seconden</span>
       </div>
     </div>
   `;
@@ -82,7 +184,7 @@ function pad(num) {
 function updateCountdowns() {
   const now = new Date();
 
-  events.forEach((event) => {
+  sortedEvents.forEach((event) => {
     const target = event.getDate();
     const diff = Math.max(0, target - now);
 
