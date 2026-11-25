@@ -1,6 +1,5 @@
 const TIMEZONE = 'Europe/Amsterdam';
 
-// Converteer een kalenderdatum (jaar, maand 1-12, dag) naar exact 00:00:00 Nederlandse tijd
 function getDutchMidnight(year, month, day) {
   const approxUtc = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
   const parts = new Intl.DateTimeFormat('en-US', {
@@ -26,7 +25,6 @@ function addDays(dateObj, days) {
   };
 }
 
-// Gregoriaanse paasberekening (voor elk jaar)
 function getEaster(year) {
   const a = year % 19;
   const b = Math.floor(year / 100);
@@ -45,7 +43,6 @@ function getEaster(year) {
   return { year, month, day };
 }
 
-// 4e donderdag van november
 function getThanksgiving(year) {
   const novFirst = new Date(Date.UTC(year, 10, 1));
   const dayOfWeek = novFirst.getUTCDay();
@@ -71,134 +68,147 @@ function getNextOccurrence(getDatePartsForYear) {
 
 const rawEvents = [
   {
-    id: 'nieuwjaarsdag',
     name: 'Nieuwjaarsdag',
     getDate: () => getNextOccurrence((y) => ({ year: y, month: 1, day: 1 }))
   },
   {
-    id: 'goede-vrijdag',
     name: 'Goede Vrijdag',
     getDate: () => getNextOccurrence((y) => addDays(getEaster(y), -2))
   },
   {
-    id: 'eerste-paasdag',
     name: 'Eerste Paasdag',
     getDate: () => getNextOccurrence((y) => getEaster(y))
   },
   {
-    id: 'tweede-paasdag',
     name: 'Tweede Paasdag',
     getDate: () => getNextOccurrence((y) => addDays(getEaster(y), 1))
   },
   {
-    id: 'koningsdag',
     name: 'Koningsdag',
     getDate: () =>
       getNextOccurrence((y) => {
-        // Als 27 april op een zondag valt, wordt Koningsdag op 26 april gevierd
         const isSunday = new Date(Date.UTC(y, 3, 27)).getUTCDay() === 0;
         return { year: y, month: 4, day: isSunday ? 26 : 27 };
       })
   },
   {
-    id: 'hemelvaartsdag',
     name: 'Hemelvaartsdag',
     getDate: () => getNextOccurrence((y) => addDays(getEaster(y), 39))
   },
   {
-    id: 'eerste-pinksterdag',
     name: 'Eerste Pinksterdag',
     getDate: () => getNextOccurrence((y) => addDays(getEaster(y), 49))
   },
   {
-    id: 'tweede-pinksterdag',
     name: 'Tweede Pinksterdag',
     getDate: () => getNextOccurrence((y) => addDays(getEaster(y), 50))
   },
   {
-    id: 'thanksgiving',
     name: 'Thanksgiving',
     getDate: () => getNextOccurrence((y) => getThanksgiving(y))
   },
   {
-    id: 'eerste-kerstdag',
-    name: 'Christmas / Eerste Kerstdag',
+    name: 'Eerste Kerstdag',
     getDate: () => getNextOccurrence((y) => ({ year: y, month: 12, day: 25 }))
   },
   {
-    id: 'tweede-kerstdag',
     name: 'Tweede Kerstdag',
     getDate: () => getNextOccurrence((y) => ({ year: y, month: 12, day: 26 }))
   }
 ];
 
-const container = document.getElementById('countdown-list');
+function getSortedEvents() {
+  return rawEvents
+    .map((ev) => ({ ...ev, target: ev.getDate() }))
+    .sort((a, b) => a.target - b.target);
+}
 
-// Sorteer zodat de eerstvolgende feestdag altijd bovenaan staat
-const sortedEvents = rawEvents
-  .map((ev) => ({ ...ev, target: ev.getDate() }))
-  .sort((a, b) => a.target - b.target);
+let events = getSortedEvents();
+let currentIndex = 0;
 
-sortedEvents.forEach((event) => {
-  const formattedDate = event.target.toLocaleDateString('nl-NL', {
-    timeZone: TIMEZONE,
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
+const widget = document.getElementById('widget');
 
-  const section = document.createElement('section');
-  section.className = 'countdown-item';
-  section.innerHTML = `
-    <div class="event-header">
-      <h2 class="event-title">${event.name}</h2>
-      <span class="event-date">${formattedDate}</span>
+widget.innerHTML = `
+  <div class="header-row">
+    <button class="nav-btn" id="prev-btn" aria-label="Vorige">&lsaquo;</button>
+    <div class="event-info">
+      <h1 class="event-title" id="event-title"></h1>
+      <span class="event-date" id="event-date"></span>
     </div>
-    <div class="timer">
-      <div class="unit">
-        <span class="number" id="${event.id}-days">00</span>
-        <span class="label">Dagen</span>
-      </div>
-      <div class="unit">
-        <span class="number" id="${event.id}-hours">00</span>
-        <span class="label">Uren</span>
-      </div>
-      <div class="unit">
-        <span class="number" id="${event.id}-minutes">00</span>
-        <span class="label">Minuten</span>
-      </div>
-      <div class="unit">
-        <span class="number" id="${event.id}-seconds">00</span>
-        <span class="label">Seconden</span>
-      </div>
+    <button class="nav-btn" id="next-btn" aria-label="Volgende">&rsaquo;</button>
+  </div>
+  <div class="timer">
+    <div class="unit">
+      <span class="number" id="days">00</span>
+      <span class="label">Dagen</span>
     </div>
-  `;
-  container.appendChild(section);
-});
+    <div class="unit">
+      <span class="number" id="hours">00</span>
+      <span class="label">Uren</span>
+    </div>
+    <div class="unit">
+      <span class="number" id="minutes">00</span>
+      <span class="label">Minuten</span>
+    </div>
+    <div class="unit">
+      <span class="number" id="seconds">00</span>
+      <span class="label">Seconden</span>
+    </div>
+  </div>
+`;
 
 function pad(num) {
   return String(num).padStart(2, '0');
 }
 
-function updateCountdowns() {
-  const now = new Date();
-
-  sortedEvents.forEach((event) => {
-    const target = event.getDate();
-    const diff = Math.max(0, target - now);
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / 1000 / 60) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
-
-    document.getElementById(`${event.id}-days`).textContent = pad(days);
-    document.getElementById(`${event.id}-hours`).textContent = pad(hours);
-    document.getElementById(`${event.id}-minutes`).textContent = pad(minutes);
-    document.getElementById(`${event.id}-seconds`).textContent = pad(seconds);
+function renderHeader() {
+  const current = events[currentIndex];
+  document.getElementById('event-title').textContent = current.name;
+  document.getElementById('event-date').textContent = current.target.toLocaleDateString('nl-NL', {
+    timeZone: TIMEZONE,
+    weekday: 'short',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
   });
 }
 
-updateCountdowns();
-setInterval(updateCountdowns, 1000);
+function updateTimer() {
+  const now = new Date();
+  let current = events[currentIndex];
+
+  // Herbereken als een datum zojuist verstreken is
+  if (now >= current.target) {
+    events = getSortedEvents();
+    currentIndex = 0;
+    current = events[0];
+    renderHeader();
+  }
+
+  const diff = Math.max(0, current.target - now);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / 1000 / 60) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  document.getElementById('days').textContent = pad(days);
+  document.getElementById('hours').textContent = pad(hours);
+  document.getElementById('minutes').textContent = pad(minutes);
+  document.getElementById('seconds').textContent = pad(seconds);
+}
+
+document.getElementById('prev-btn').addEventListener('click', () => {
+  currentIndex = (currentIndex - 1 + events.length) % events.length;
+  renderHeader();
+  updateTimer();
+});
+
+document.getElementById('next-btn').addEventListener('click', () => {
+  currentIndex = (currentIndex + 1) % events.length;
+  renderHeader();
+  updateTimer();
+});
+
+renderHeader();
+updateTimer();
+setInterval(updateTimer, 1000);
